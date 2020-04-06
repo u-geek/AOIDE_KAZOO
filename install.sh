@@ -250,7 +250,5 @@ if [ $UID -ne 0 ]; then
 	echo "Superuser privileges are required to run this script.\ne.g. \"sudo $0\"" 10 60
     exit 1
 fi
-pip3 install --upgrade mopidy-iris Mopidy-PiDi pidi-display-pil pidi-display-st7789 mopidy-raspberry-gpio
 
-
-#main
+main
