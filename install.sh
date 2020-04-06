@@ -14,6 +14,8 @@ DC=25
 BL=27
 PACKAGES="python3-rpi.gpio python3-spidev python3-pip python3-pil python3-numpy mopidy mopidy-spotify"
 PIP_PACKAGES=""
+UPDATED=false
+INSTALL_SUCCESS=false
 
 function success() {
 	echo -e "$(tput setaf 2)$1$(tput sgr0)"
@@ -30,17 +32,34 @@ function warning() {
 # Update apt and install dependencies
 function install_sysreq() {
 	inform "Updating apt and installing dependencies"
-	REQ_STATE=$(dpkg -l $PACKAGES | grep "un  ")
-	if [ -n "$REQ_STATE" ]; then
-		if [ ! -f "/etc/apt/sources.list.d/mopidy.list" ]; then
-			inform "Adding Mopidy apt source"
-			wget -q -O - https://apt.mopidy.com/mopidy.gpg | apt-key add -
-			wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/buster.list
-		fi
-		echo "Start installing packages."
+	if [ ! -f "/etc/apt/sources.list.d/mopidy.list" ]; then
+		inform "Adding Mopidy apt source"
+		wget -q -O - https://apt.mopidy.com/mopidy.gpg | apt-key add -
+		wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/buster.list
 		apt update
+		UPDATED=true
+	fi
+	REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
+	if [ -n "$REQ_STATE" ]; then
+		echo "Start installing packages."
+		if [ "$UPDATED" = false ]; then
+			apt update
+		fi
 		#apt-mark unhold mopidy mopidy-spotify
 		apt -y install $PACKAGES
+	fi
+	REQ_STATE=$(dpkg -l $PACKAGES | grep "no packages found matching")
+	if [ -n "$REQ_STATE" ]; then
+			echo "Start installing packages."
+			if [ "$UPDATED" = false ]; then
+					apt update
+			fi
+			#apt-mark unhold mopidy mopidy-spotify
+			apt -y install $PACKAGES
+	fi
+	REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
+	if [ ! -n "$REQ_STATE" ]; then
+		INSTALL_SUCCESS=true
 	fi
 }
 
@@ -73,7 +92,6 @@ function stop_mopidy() {
 	if [ "$RESULT" == "0" ]; then
 		inform "Stopping Mopidy service..."
 		systemctl stop mopidy
-		echo
 	fi
 }
 
@@ -177,10 +195,10 @@ client_id =
 client_secret =
 EOF
 	usermod -a -G spi,i2c,gpio,video mopidy
-	sed -i -e "s/self.rotation =.*/self.rotation = $ROTATE/" MOPIDY_PIDI_FRONTEND
-	sed -i -e "s/self.spi_chip_select_pin =.*/self.spi_chip_select_pin = $CS/" MOPIDY_PIDI_FRONTEND
-	sed -i -e "s/self.spi_data_command_pin =.*/self.spi_data_command_pin = $DC/" MOPIDY_PIDI_FRONTEND
-	sed -i -e "s/self.backlight_pin =.*/self.backlight_pin = $BL/" MOPIDY_PIDI_FRONTEND
+	sed -i -e "s/self.rotation =.*/self.rotation = $ROTATE/" $MOPIDY_PIDI_FRONTEND
+	sed -i -e "s/self.spi_chip_select_pin =.*/self.spi_chip_select_pin = $CS/" $MOPIDY_PIDI_FRONTEND
+	sed -i -e "s/self.spi_data_command_pin =.*/self.spi_data_command_pin = $DC/" $MOPIDY_PIDI_FRONTEND
+	sed -i -e "s/self.backlight_pin =.*/self.backlight_pin = $BL/" $MOPIDY_PIDI_FRONTEND
 }
 
 function enable_mopidy() {
@@ -191,6 +209,12 @@ function enable_mopidy() {
 
 function main() {
 	install_sysreq
+	if [ "$INSTALL_SUCCESS" = false ]; then
+		install_sysreq
+	fi
+	if [ "$INSTALL_SUCCESS" = false ]; then
+		install_sysreq
+	fi
 	stop_mopidy
 	backup_mopidy
 	sys_config
@@ -198,7 +222,8 @@ function main() {
 	install_sysreq_python
 	config_mopidy_system_sh
 	config_mopidy
-	success "All done!"
+	enable_mopidy
+	success "All done! Please reboot."
 }
 
 # Permission detection
