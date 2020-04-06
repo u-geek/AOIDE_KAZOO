@@ -42,7 +42,7 @@ function install_sysreq() {
 	fi
 	REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
 	if [ -n "$REQ_STATE" ]; then
-		echo "Start installing packages."
+		inform "Start installing packages."
 		if [ "$UPDATED" = false ]; then
 			apt update
 			UPDATED=true
@@ -52,7 +52,7 @@ function install_sysreq() {
 	fi
 	REQ_STATE=$(dpkg -l $PACKAGES_MOPIDY | grep "mopidy")
 	if [ ! -n "$REQ_STATE" ]; then
-			echo "Start installing mopidy packages."
+			inform "Start installing mopidy packages."
 			if [ "$UPDATED" = false ]; then
 					apt update
 					UPDATED=true
@@ -61,8 +61,8 @@ function install_sysreq() {
 			apt -y install $PACKAGES_MOPIDY
 	fi
 	REQ_STATE=$(dpkg -l $PACKAGES_MOPIDY | grep "rc ")
-	if [ ! -n "$REQ_STATE" ]; then
-			echo "Start installing mopidy packages."
+	if [ -n "$REQ_STATE" ]; then
+			inform "Start installing mopidy packages."
 			if [ "$UPDATED" = false ]; then
 					apt update
 					UPDATED=true
