@@ -134,6 +134,8 @@ function install_sysreq_python() {
 	# Install Mopidy Iris web UI and support plugins
 	inform "Installing Iris web UI for Mopidy & Pirate Audio plugins..."
 	$PIP_BIN install --upgrade mopidy-iris Mopidy-PiDi pidi-display-pil pidi-display-st7789 mopidy-raspberry-gpio
+	$PIP_BIN install --upgrade mopidy-iris Mopidy-PiDi pidi-display-pil pidi-display-st7789 mopidy-raspberry-gpio
+	$PIP_BIN install --upgrade mopidy-iris Mopidy-PiDi pidi-display-pil pidi-display-st7789 mopidy-raspberry-gpio
 }
 
 # Get location of Iris's system.sh
@@ -248,5 +250,7 @@ if [ $UID -ne 0 ]; then
 	echo "Superuser privileges are required to run this script.\ne.g. \"sudo $0\"" 10 60
     exit 1
 fi
+pip3 install --upgrade mopidy-iris Mopidy-PiDi pidi-display-pil pidi-display-st7789 mopidy-raspberry-gpio
 
-main
+
+#main
