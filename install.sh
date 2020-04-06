@@ -12,7 +12,8 @@ ROTATE=180
 CS=0
 DC=25
 BL=27
-PACKAGES="python3-rpi.gpio python3-spidev python3-pip python3-pil python3-numpy mopidy mopidy-spotify"
+PACKAGES="python3-rpi.gpio python3-spidev python3-pip python3-pil python3-numpy"
+PACKAGES_MOPIDY="mopidy mopidy-spotify"
 PIP_PACKAGES=""
 UPDATED=false
 INSTALL_SUCCESS=false
@@ -44,23 +45,39 @@ function install_sysreq() {
 		echo "Start installing packages."
 		if [ "$UPDATED" = false ]; then
 			apt update
+			UPDATED=true
 		fi
 		#apt-mark unhold mopidy mopidy-spotify
 		apt -y install $PACKAGES
 	fi
-	REQ_STATE=$(dpkg -l $PACKAGES | grep "no packages found matching")
-	if [ -n "$REQ_STATE" ]; then
-			echo "Start installing packages."
+	REQ_STATE=$(dpkg -l $PACKAGES_MOPIDY | grep "mopidy")
+	if [ ! -n "$REQ_STATE" ]; then
+			echo "Start installing mopidy packages."
 			if [ "$UPDATED" = false ]; then
 					apt update
+					UPDATED=true
 			fi
 			#apt-mark unhold mopidy mopidy-spotify
-			apt -y install $PACKAGES
+			apt -y install $PACKAGES_MOPIDY
+	fi
+	REQ_STATE=$(dpkg -l $PACKAGES_MOPIDY | grep "rc ")
+	if [ ! -n "$REQ_STATE" ]; then
+			echo "Start installing mopidy packages."
+			if [ "$UPDATED" = false ]; then
+					apt update
+					UPDATED=true
+			fi
+			#apt-mark unhold mopidy mopidy-spotify
+			apt -y install $PACKAGES_MOPIDY
 	fi
 	REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
 	if [ ! -n "$REQ_STATE" ]; then
-		INSTALL_SUCCESS=true
+		REQ_STATE2=$(dpkg -l $PACKAGES | grep "rc ")
+		if [ ! -n "$REQ_STATE2" ]; then
+			INSTALL_SUCCESS=true
+		fi
 	fi
+	
 }
 
 # Verify python version via pip
