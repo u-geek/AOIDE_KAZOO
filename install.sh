@@ -165,6 +165,9 @@ EOF`
 
 function config_mopidy() {
 	inform "Configuring Mopidy"
+	if [ -f "$MOPIDY_CONFIG" ]; then
+		rm $MOPIDY_CONFIG
+	fi
 	cat <<EOF >> $MOPIDY_CONFIG
 
 [raspberry-gpio]
