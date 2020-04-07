@@ -120,6 +120,10 @@ function sys_config() {
 	#add_to_config_text "gpio=25=op,dh" $CONFIG_BOOT
 	sed -i '/^dtoverlay=hifiberry-dacplus/d' $CONFIG_BOOT
 	echo "dtoverlay=hifiberry-dacplus" >> $CONFIG_BOOT
+	sed -i '/^dtoverlay=gpio-ir/d' $CONFIG_BOOT
+        echo "dtoverlay=gpio-ir,gpio_pin=4" >> $CONFIG_BOOT
+	sed -i '/^dtoverlay=gpio-ir-tx/d' $CONFIG_BOOT
+        echo "dtoverlay=gpio-ir-tx,gpio_pin=17" >> $CONFIG_BOOT
 }
 
 function backup_mopidy() {
