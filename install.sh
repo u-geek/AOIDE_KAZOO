@@ -5,6 +5,7 @@ CONFIG_BOOT="/boot/config.txt"
 MOPIDY_CONFIG="/etc/mopidy/mopidy.conf"
 MOPIDY_SUDOERS="/etc/sudoers.d/010_mopidy-nopasswd"
 MOPIDY_PIDI_FRONTEND="/usr/local/lib/python3.7/dist-packages/mopidy_pidi/frontend.py"
+MOPIDY_EXT_ALSAMIXER_CONF="/usr/lib/python3/dist-packages/mopidy_alsamixer/ext.conf"
 EXISTING_CONFIG=false
 PYTHON_MAJOR_VERSION=3
 PIP_BIN=pip3
@@ -13,7 +14,7 @@ CS=0
 DC=25
 BL=27
 PACKAGES="python3-rpi.gpio python3-spidev python3-pip python3-pil python3-numpy"
-PACKAGES_MOPIDY="mopidy mopidy-spotify"
+PACKAGES_MOPIDY="mopidy mopidy-spotify modipy-alsamixer"
 PIP_PACKAGES=""
 UPDATED=false
 INSTALL_SUCCESS=false
@@ -210,7 +211,7 @@ hostname = 0.0.0.0
 hostname = 0.0.0.0
 
 [audio]
-mixer_volume = 40
+mixer_volume = 50
 output = alsasink device=hw:sndrpihifiberry
 
 [spotify]
@@ -225,6 +226,15 @@ EOF
 	sed -i -e "s/self.spi_chip_select_pin =.*/self.spi_chip_select_pin = $CS/" $MOPIDY_PIDI_FRONTEND
 	sed -i -e "s/self.spi_data_command_pin =.*/self.spi_data_command_pin = $DC/" $MOPIDY_PIDI_FRONTEND
 	sed -i -e "s/self.backlight_pin =.*/self.backlight_pin = $BL/" $MOPIDY_PIDI_FRONTEND
+    cat <<EOF > $MOPIDY_EXT_ALSAMIXER_CONF
+[alsamixer]
+enabled = true
+card = 1
+control = Digital
+min_volume = 0
+max_volume = 80
+volume_scale = cubic
+EOF
 }
 
 function enable_mopidy() {
