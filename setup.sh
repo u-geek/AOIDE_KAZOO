@@ -1,5 +1,5 @@
 #!/bin/bash
-PACKAGES="curl git mpc mpd ncmpc samba samba-common-bin dnsmasq hostapd bridge-utils libasound2-dev libudev-dev libibus-1.0-dev libdbus-1-dev fcitx-libs-dev libsndio-dev libx11-dev libxcursor-dev libxext-dev libxi-dev libxinerama-dev libxkbcommon-dev libxrandr-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libgl1-mesa-dev libglu1-mesa-dev libdrm-dev libgbm-dev devscripts debhelper dh-autoreconf libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2"
+PACKAGES="curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libasound2-dev libudev-dev libibus-1.0-dev libdbus-1-dev fcitx-libs-dev libsndio-dev libx11-dev libxcursor-dev libxext-dev libxi-dev libxinerama-dev libxkbcommon-dev libxrandr-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libgl1-mesa-dev libglu1-mesa-dev libdrm-dev libgbm-dev devscripts debhelper dh-autoreconf libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2"
 URL_LIBSDL2="https://files.retropie.org.uk/binaries/buster/rpi1/libsdl2-2.0-0_2.0.10+5rpi_armhf.deb"
 URL_LIBSDL2_DEV="https://files.retropie.org.uk/binaries/buster/rpi1/libsdl2-dev_2.0.10+5rpi_armhf.deb"
 FILE_RCLOCAL="/etc/rc.local"
@@ -119,6 +119,7 @@ function install_sysreq() {
 # config config.txt
 function config_config() {
     inform "Modify $FILE_CONFIG"
+	sed -i '/^dtparam=audio=on/d' $FILE_CONFIG
     sed -i '/^hdmi_group=/d' $FILE_CONFIG
     sed -i '/^hdmi_mode=/d' $FILE_CONFIG
     sed -i '/^hdmi_cvt=/d' $FILE_CONFIG
@@ -128,6 +129,7 @@ function config_config() {
     sed -i '/^gpio=20=ip,pu/d' $FILE_CONFIG
     
 	cat << EOF >> $FILE_CONFIG
+dtparam=audio=off
 hdmi_group=2
 hdmi_mode=87
 hdmi_cvt=240 240 60 1 0 0 0
@@ -275,7 +277,7 @@ function install_player() {
 	sed -i '/AOIDE_KAZOO/d' $FILE_CONFIG
 	sed -i '/play/d' $FILE_CONFIG
 	sed -i '/^exit 0/cd \/home\/pi\/AOIDE_KAZOO' $FILE_RCLOCAL
-	sed -i '/^exit 0/./play &' $FILE_RCLOCAL
+	sed -i '/^exit 0/.\/play &' $FILE_RCLOCAL
 }
 
 # main loop
