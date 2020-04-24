@@ -270,11 +270,11 @@ function config_rc_local() {
 	inform "Config $FILE_RCLOCAL"
     fbcp_configured=$(cat /etc/rc.local | grep "fbcp-ili9341")
     if [ -z "$fbcp_configured" ]; then
-		sed -i '/exit 0/i\/usr\/local\/bin\/fbcp-ili9341 &' $FILE_RCLOCAL
+		sed -i '/^exit 0/i\/usr\/local\/bin\/fbcp-ili9341 &' $FILE_RCLOCAL
 	fi
     ympd_configured=$(cat /etc/rc.local | grep "ympd")
     if [ -z "$ympd_configured" ]; then
-		sed -i '/exit 0/i\/usr\/local\/bin\/ympd --webport 80 &' $FILE_RCLOCAL
+		sed -i '/^exit 0/i\/usr\/local\/bin\/ympd --webport 80 &' $FILE_RCLOCAL
 	fi
 }
 
@@ -287,8 +287,8 @@ function install_player() {
 	fi
 	sed -i '/AOIDE_KAZOO/d' $FILE_CONFIG
 	sed -i '/play/d' $FILE_CONFIG
-	sed -i '/exit 0/icd \/home\/pi\/AOIDE_KAZOO' $FILE_RCLOCAL
-	sed -i '/exit 0/i.\/play &' $FILE_RCLOCAL
+	sed -i '/^exit 0/icd \/home\/pi\/AOIDE_KAZOO' $FILE_RCLOCAL
+	sed -i '/^exit 0/i.\/play &' $FILE_RCLOCAL
 }
 
 # main loop
