@@ -1,6 +1,6 @@
 #!/bin/bash
 PACKAGES_OLD="curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libasound2-dev libudev-dev libibus-1.0-dev libdbus-1-dev fcitx-libs-dev libsndio-dev libx11-dev libxcursor-dev libxext-dev libxi-dev libxinerama-dev libxkbcommon-dev libxrandr-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libgl1-mesa-dev libglu1-mesa-dev libdrm-dev libgbm-dev devscripts debhelper dh-autoreconf libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2"
-PACKAGES="curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2"
+PACKAGES="curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2 fcitx-libs-dev libdrm-dev libgbm-dev"
 URL_LIBSDL2="https://files.retropie.org.uk/binaries/buster/rpi1/libsdl2-2.0-0_2.0.10+5rpi_armhf.deb"
 URL_LIBSDL2_DEV="https://files.retropie.org.uk/binaries/buster/rpi1/libsdl2-dev_2.0.10+5rpi_armhf.deb"
 FILE_RCLOCAL="/etc/rc.local"
@@ -29,7 +29,7 @@ function warning() {
 # Update apt and install dependencies
 function install_sysreq() {
 	inform "Updating apt and installing dependencies"
-	sudo apt update
+	apt update
 	REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
 	if [ -n "$REQ_STATE" ]; then
 		inform "Start installing packages."
@@ -37,7 +37,7 @@ function install_sysreq() {
 			# apt update
 			# UPDATED=true
 		# fi
-		apt -y install $PACKAGES
+		apt -y --force-yes install $PACKAGES
 	fi
     
     REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
@@ -300,11 +300,15 @@ function main() {
     config_samba
     config_ap
 	install_player
+	inform "Sync..."
+	sync
+	inform "Now reboot..."
+	reboot
 }
 
 # Permission detection
 if [ $UID -ne 0 ]; then
-	echo "Superuser privileges are required to run this script.\ne.g. \"sudo $0\"" 10 60
+	inform "Superuser privileges are required to run this script.\ne.g. \"sudo $0\"" 10 60
     exit 1
 fi
 
