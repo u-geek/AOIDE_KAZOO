@@ -1,9 +1,11 @@
 #!/bin/bash
-PACKAGES="curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libasound2-dev libudev-dev libibus-1.0-dev libdbus-1-dev fcitx-libs-dev libsndio-dev libx11-dev libxcursor-dev libxext-dev libxi-dev libxinerama-dev libxkbcommon-dev libxrandr-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libgl1-mesa-dev libglu1-mesa-dev libdrm-dev libgbm-dev devscripts debhelper dh-autoreconf libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2"
+PACKAGES_OLD="curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libasound2-dev libudev-dev libibus-1.0-dev libdbus-1-dev fcitx-libs-dev libsndio-dev libx11-dev libxcursor-dev libxext-dev libxi-dev libxinerama-dev libxkbcommon-dev libxrandr-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libgl1-mesa-dev libglu1-mesa-dev libdrm-dev libgbm-dev devscripts debhelper dh-autoreconf libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2"
+PACKAGES="curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2"
 URL_LIBSDL2="https://files.retropie.org.uk/binaries/buster/rpi1/libsdl2-2.0-0_2.0.10+5rpi_armhf.deb"
 URL_LIBSDL2_DEV="https://files.retropie.org.uk/binaries/buster/rpi1/libsdl2-dev_2.0.10+5rpi_armhf.deb"
 FILE_RCLOCAL="/etc/rc.local"
 FILE_CONFIG="/boot/config.txt"
+FILE_MPDCONFIG="/etc/mpd.conf"
 UPMPD_URL="http://www.lesbonscomptes.com/upmpdcli/downloads/raspbian/pool/main/u/upmpdcli/upmpdcli_1.2.16-1~ppa1~stretch_armhf.deb"
 UPMPD_FILENAME="upmpdcli_1.2.16-1~ppa1~stretch_armhf.deb"
 LIBUPNP6_URL="http://www.lesbonscomptes.com/upmpdcli/downloads/raspbian/pool/main/libu/libupnp/libupnp6_1.6.20.jfd5-1~ppa1~stretch_armhf.deb"
@@ -101,19 +103,19 @@ function install_sysreq() {
 	dpkg -i packages/libsdl2-*.deb
 	
 	inform "Install ympd"
-    if [ ! -f "/usr/bin/ympd" ]; then
-        cp packages/ympd /usr/bin/
+    if [ ! -f "/usr/local/bin/ympd" ]; then
+        cp packages/ympd /usr/local/bin/
     fi
 	
 	inform "Install fbcp"
-    if [ ! -f "/usr/bin/fbcp-ili9341" ]; then
-        cp packages/fbcp-ili9341 /usr/bin/
+    if [ ! -f "/usr/local/bin/fbcp-ili9341" ]; then
+        cp packages/fbcp-ili9341 /usr/local/bin/
     fi
 	
-	inform "Install keypad"
-    if [ ! -f "/boot/overlays/keypad.dtbo" ]; then
-        cp packages/keypad.dtbo /boot/overlays
-    fi
+	# inform "Install keypad"
+    # if [ ! -f "/boot/overlays/keypad.dtbo" ]; then
+        # cp packages/keypad.dtbo /boot/overlays
+    # fi
 }
 
 # config config.txt
@@ -125,18 +127,17 @@ function config_config() {
     sed -i '/^hdmi_cvt=/d' $FILE_CONFIG
     sed -i '/^hdmi_force_hotplug=/d' $FILE_CONFIG
     sed -i '/^dtoverlay=hifiberry-dacplus/d' $FILE_CONFIG
-    sed -i '/^dtoverlay=dtoverlay=keypad/d' $FILE_CONFIG
-    sed -i '/^gpio=20=ip,pu/d' $FILE_CONFIG
+    #sed -i '/^dtoverlay=dtoverlay=keypad/d' $FILE_CONFIG
+    #sed -i '/^gpio=20=ip,pu/d' $FILE_CONFIG
     
 	cat << EOF >> $FILE_CONFIG
+	
 dtparam=audio=off
 hdmi_group=2
 hdmi_mode=87
 hdmi_cvt=240 240 60 1 0 0 0
 hdmi_force_hotplug=1
 dtoverlay=hifiberry-dacplus
-#dtoverlay=keypad
-#gpio=20=ip,pu
 
 EOF
 }
@@ -147,13 +148,22 @@ function config_mpd() {
     systemctl stop mpd
     #cp resources/mpd.conf /etc/mpd.conf
     inform ">Config Music Player Daemon"
-	if [ ! -d "/home/pi/music" ]; then
+	if [ ! -d "/home/pi/Music" ]; then
 		sudo -u pi mkdir /home/pi/Music
 	fi
-#	sed -i -e 's/\/var\/lib\/mpd\/music/\/home\/pi\/music/g' /etc/mpd.conf
 	sed -i -e 's/^music_directory.*".*"/music_directory "\/home\/pi\/Music"/' /etc/mpd.conf
-	sed -i 's/#[ \t]*mixer_device[ \t]*\".*\".*/\tmixer_device\t\"hw:0\"/' /etc/mpd.conf
-    sed -i 's/#[ \t]*mixer_control[ \t]*\".*\".*/\tmixer_control\t\"Digital\"/' /etc/mpd.conf
+	sed -i -e ':a;N;$!ba;s/audio_output.*/}/' $FILE_MPDCONFIG
+	cat << EOF >> $FILE_MPDCONFIG
+audio_output {
+        type            "alsa"
+        name            "KAZOO"
+        device          "hw:0,0"        # optional
+        mixer_type      "hardware"      # optional
+        mixer_device    "hw:0"
+        mixer_control   "Digital"
+#       mixer_index     "0"             # optional
+}
+EOF
     systemctl start mpd
 }
 
@@ -206,6 +216,7 @@ EOF
 	sed -i 's/^DAEMON_CONF=\".*\"/DAEMON_CONF=\"\/etc\/hostapd\/hostapd.conf\"/g' /etc/default/hostapd
 
 	cp /usr/sbin/hostapd-ori /usr/sbin/hostapd
+	systemctl unmask hostapd
 	systemctl enable hostapd
 	systemctl start hostapd
 	systemctl enable dnsmasq
@@ -276,8 +287,8 @@ function install_player() {
 	fi
 	sed -i '/AOIDE_KAZOO/d' $FILE_CONFIG
 	sed -i '/play/d' $FILE_CONFIG
-	sed -i '/^exit 0/cd \/home\/pi\/AOIDE_KAZOO' $FILE_RCLOCAL
-	sed -i '/^exit 0/.\/play &' $FILE_RCLOCAL
+	sed -i '/exit 0/icd \/home\/pi\/AOIDE_KAZOO' $FILE_RCLOCAL
+	sed -i '/exit 0/i.\/play &' $FILE_RCLOCAL
 }
 
 # main loop
