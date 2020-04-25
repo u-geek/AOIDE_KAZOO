@@ -31,7 +31,7 @@ function install_sysreq() {
 	inform "Updating apt and installing dependencies"
 	apt update
 	REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
-	if [ -n "$REQ_STATE" ]; then
+	if [ ! -n "$REQ_STATE" ]; then
 		inform "Start installing packages."
 		# if [ "$UPDATED" = false ]; then
 			# apt update
@@ -41,7 +41,7 @@ function install_sysreq() {
 	fi
     
     REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
-    if [ -n "$REQ_STATE" ]; then
+    if [ ! -n "$REQ_STATE" ]; then
         warning "Packages install failed! try to fix."
 	apt -y --fix-broken install
     else
@@ -49,7 +49,7 @@ function install_sysreq() {
     fi
 
     REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
-    if [ -n "$REQ_STATE" ]; then
+    if [ ! -n "$REQ_STATE" ]; then
         warning "Packages install failed again! exit."
 	exit
     fi
