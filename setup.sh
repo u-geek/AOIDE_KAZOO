@@ -15,6 +15,7 @@ LIBUPNPP4_FILENAME="libupnpp4_0.16.1-1~ppa1~stretch_armhf.deb"
 SHAIRPORTSYNCMR_URL="http://repo.volumio.org/Volumio2/Binaries/shairport-sync-metadata-reader-arm.tar.gz"
 SHAIRPORTSYNCMR_FILENAME="shairport-sync-metadata-reader-arm.tar.gz"
 RETROGAME_URL="https://github.com/adafruit/Adafruit-Retrogame/raw/master/retrogame"
+FILE_MODULES="/etc/modules"
 
 function success() {
 	echo -e "$(tput setaf 2)$1$(tput sgr0)"
@@ -163,7 +164,7 @@ function config_mpd() {
 		sudo -u pi mkdir /home/pi/Music
 	fi
 	sed -i -e 's/^music_directory.*".*"/music_directory "\/home\/pi\/Music"/' /etc/mpd.conf
-	sed -i -e ':a;N;$!ba;s/audio_output.*/}/' $FILE_MPDCONFIG
+	sed -i -e ':a;N;$!ba;s/audio_output.*{.*/}/' $FILE_MPDCONFIG
 	cat << EOF >> $FILE_MPDCONFIG
 audio_output {
         type            "alsa"
@@ -315,10 +316,10 @@ function config_input(){
 	fi
 	touch /boot/retrogame.cfg
 	cat << EOF >> /boot/retrogame.cfg
-LEFT      5
-RIGHT     16
-UP        20
-DOWN      21
+UP      5
+DOWN     16
+LEFT        20
+RIGHT      6
 EOF
 
 }
@@ -330,26 +331,26 @@ function install_player() {
 		cd /home/pi/
 		git clone https://github.com/howardqiao/AOIDE_KAZOO --depth 1
 	fi
-	sed -i '/^cd \/home\/pi\/AOIDE_KAZOO/d' $FILE_CONFIG
-	sed -i '/^.\/play/d' $FILE_CONFIG
+	sed -i '/cd \/home\/pi\/AOIDE_KAZOO/d' $FILE_RCLOCAL
+	sed -i '/.\/play/d' $FILE_RCLOCAL
 	sed -i '/^exit 0/icd \/home\/pi\/AOIDE_KAZOO' $FILE_RCLOCAL
 	sed -i '/^exit 0/i.\/play &' $FILE_RCLOCAL
 }
 
 # main loop
 function main() {
-    install_sysreq
+    #install_sysreq
     config_config
     config_rc_local
     config_mpd
-    config_samba
-    config_ap
+    #config_samba
+    #config_ap
 	config_input
 	install_player
 	inform "Sync..."
 	sync
 	inform "Now reboot..."
-	reboot
+	#reboot
 }
 
 # Permission detection
