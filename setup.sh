@@ -294,8 +294,8 @@ function install_player() {
 		cd /home/pi/
 		git clone https://github.com/howardqiao/AOIDE_KAZOO --depth 1
 	fi
-	sed -i '/AOIDE_KAZOO/d' $FILE_CONFIG
-	sed -i '/play/d' $FILE_CONFIG
+	sed -i '/^cd \/home\/pi\/AOIDE_KAZOO/d' $FILE_CONFIG
+	sed -i '/^.\/play/d' $FILE_CONFIG
 	sed -i '/^exit 0/icd \/home\/pi\/AOIDE_KAZOO' $FILE_RCLOCAL
 	sed -i '/^exit 0/i.\/play &' $FILE_RCLOCAL
 }
@@ -321,6 +321,5 @@ if [ $UID -ne 0 ]; then
     exit 1
 fi
 
-# main loop
 main
 
