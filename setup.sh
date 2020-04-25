@@ -14,6 +14,8 @@ LIBUPNPP4_URL="http://www.lesbonscomptes.com/upmpdcli/downloads/raspbian/pool/ma
 LIBUPNPP4_FILENAME="libupnpp4_0.16.1-1~ppa1~stretch_armhf.deb"
 SHAIRPORTSYNCMR_URL="http://repo.volumio.org/Volumio2/Binaries/shairport-sync-metadata-reader-arm.tar.gz"
 SHAIRPORTSYNCMR_FILENAME="shairport-sync-metadata-reader-arm.tar.gz"
+RETROGAME_URL="https://github.com/adafruit/Adafruit-Retrogame/raw/master/retrogame"
+
 function success() {
 	echo -e "$(tput setaf 2)$1$(tput sgr0)"
 }
@@ -287,6 +289,40 @@ function config_rc_local() {
 	fi
 }
 
+function config_input(){
+	inform "Config input"
+	sed -i '/^uinput/d' $FILE_MODULES
+	if [ -e "/etc/udev/rules.d/10-retrogame.rules" ]; then
+		rm /etc/udev/rules.d/10-retrogame.rules
+	fi
+	sed -i '/^\/usr\/local\/bin\/retrogame &/d' $FILE_RCLOCAL
+	if [ -f "/boot/retrogame.cfg" ]; then
+		rm /boot/retrogame.cfg
+	fi
+	echo "uinput" >> $FILE_MODULES
+	touch /etc/udev/rules.d/10-retrogame.rules
+	echo "SUBSYSTEM==\"input\", ATTRS{name}==\"retrogame\", ENV{ID_INPUT_KEYBOARD}=\"1\"" > /etc/udev/rules.d/10-retrogame.rules
+	if [ ! -f "/usr/local/bin/retrogame" ]; then
+		if [ ! -f "packages/retrogame" ]; then
+			curl -LJ0 -o /usr/local/bin/retrogame $RETROGAME_URL
+			chmod +x /usr/local/bin/retrogame
+		fi
+		cp packages/retrogame /usr/local/bin/retrogame
+	fi
+	sed -i '/^exit 0/i\/usr\/local\/bin\/retrogame &' $FILE_RCLOCAL
+	if [ -f "/boot/retrogame.cfg" ]; then
+		rm /boot/retrogame.cfg
+	fi
+	touch /boot/retrogame.cfg
+	cat << EOF >> /boot/retrogame.cfg
+LEFT      5
+RIGHT     16
+UP        20
+DOWN      21
+EOF
+
+}
+
 # Install Player
 function install_player() {
 	inform "Install AOIDE KAZOO Player"
@@ -308,6 +344,7 @@ function main() {
     config_mpd
     config_samba
     config_ap
+	config_input
 	install_player
 	inform "Sync..."
 	sync
