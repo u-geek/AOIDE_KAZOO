@@ -1,4 +1,5 @@
 #!/bin/bash
+PATH_PREFIX=$PWD
 PACKAGES_OLD="curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libasound2-dev libudev-dev libibus-1.0-dev libdbus-1-dev fcitx-libs-dev libsndio-dev libx11-dev libxcursor-dev libxext-dev libxi-dev libxinerama-dev libxkbcommon-dev libxrandr-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libgl1-mesa-dev libglu1-mesa-dev libdrm-dev libgbm-dev devscripts debhelper dh-autoreconf libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2"
 PACKAGES="imagemagick ffmpeg curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2 fcitx-libs-dev libdrm-dev libgbm-dev libjsoncpp1 libmicrohttpd12 shairport-sync"
 URL_LIBSDL2="https://files.retropie.org.uk/binaries/buster/rpi1/libsdl2-2.0-0_2.0.10+5rpi_armhf.deb"
@@ -81,15 +82,15 @@ function install_sysreq() {
 		# echo "Upmpdcli install complete."
 	# fi
 
-	if [ ! -f "/usr/local/bin/shairport-sync-metadata-reader" ]; then
-		echo "Install shairpot-sync metadata reader."
-		cd /
-		curl -LJ0 -o $SHAIRPORTSYNCMR_FILENAME  $SHAIRPORTSYNCMR_URL
-		tar xf $SHAIRPORTSYNCMR_FILENAME
-		if [ -f "$SHAIRPORTSYNCMR_FILENAME" ]; then
-			rm $SHAIRPORTSYNCMR_FILENAME
-		fi
-	fi
+#	if [ ! -f "/usr/local/bin/shairport-sync-metadata-reader" ]; then
+#		if [ ! -f "pack
+#		echo "Install shairpot-sync metadata reader."
+#		curl -LJ0 -o $SHAIRPORTSYNCMR_FILENAME  $SHAIRPORTSYNCMR_URL
+#		tar xf $SHAIRPORTSYNCMR_FILENAME
+#		if [ -f "$SHAIRPORTSYNCMR_FILENAME" ]; then
+#			rm $SHAIRPORTSYNCMR_FILENAME
+#		fi
+#	fi
     
 	inform "Install hostapd"
     if [ ! -f "/usr/sbin/hostapd-ori" ]; then
@@ -387,6 +388,5 @@ if [ $UID -ne 0 ]; then
 	inform "Superuser privileges are required to run this script.\ne.g. \"sudo $0\"" 10 60
     exit 1
 fi
-
 main
 
