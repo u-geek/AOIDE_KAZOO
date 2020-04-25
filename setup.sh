@@ -343,14 +343,14 @@ function main() {
     config_config
     config_rc_local
     config_mpd
-    #config_samba
-    #config_ap
+    config_samba
+    config_ap
 	config_input
 	install_player
 	inform "Sync..."
 	sync
 	inform "Now reboot..."
-	#reboot
+	reboot
 }
 
 # Permission detection
