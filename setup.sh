@@ -158,6 +158,12 @@ dtoverlay=hifiberry-dacplus
 EOF
 }
 
+# config hostname
+function config_hostname() {
+	echo "KAZOO" > /etc/hostname
+	sed -i "s/raspberrypi/KAZOO/g" /etc/hosts
+}
+
 # config mpd
 function config_mpd() {
 	inform "Config MPD"
@@ -181,6 +187,23 @@ audio_output {
 }
 EOF
     systemctl start mpd
+}
+
+function config_upmpdcli() {
+	systemctl stop upmpdcli
+	if [ -f "/etc/upmpdcli.conf" ]; then
+		rm /etc/upmpdcli.conf
+	fi
+	cat << EOF > /etc/upmpdcli.conf
+upnpip = 0.0.0.0
+friendlyname = KAZOO
+mpdhost = localhost
+mpdport = 6600
+onstart = mpc save currentplaying
+onstop = mpc load currentplaying
+radiolist = /usr/share/upmpdcli/radio_scripts/radiolist.conf
+EOF
+	systemctl start upmpdcli
 }
 
 function config_ap(){
@@ -344,9 +367,11 @@ function install_player() {
 # main loop
 function main() {
 	install_sysreq
+	config_hostname
 	config_config
 	config_rc_local
 	config_mpd
+	config_upmpdcli
 	config_samba
 	config_ap
 	config_input
