@@ -109,6 +109,7 @@ function install_sysreq() {
 	
 	inform "Install libsdl2"
 	dpkg -i packages/libsdl2-*.deb
+	apt -y --fix-broken install
 	
 	inform "Install ympd"
     if [ ! -f "/usr/local/bin/ympd" ]; then
