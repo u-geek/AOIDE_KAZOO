@@ -37,12 +37,13 @@ function install_sysreq() {
 			# apt update
 			# UPDATED=true
 		# fi
-		apt -y --force-yes install $PACKAGES
+		apt -y install $PACKAGES
 	fi
     
     REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
     if [ -n "$REQ_STATE" ]; then
-        failed "Packages install failed!"
+        warning "Packages install failed! try to fix."
+	apt -y --fix-broken install
     else
         success "Packages install sucessful!"
     fi
@@ -294,7 +295,7 @@ function install_player() {
 # main loop
 function main() {
     install_sysreq
-	config_config
+    config_config
     config_rc_local
     config_mpd
     config_samba
