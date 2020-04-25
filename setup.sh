@@ -47,7 +47,14 @@ function install_sysreq() {
     else
         success "Packages install sucessful!"
     fi
-    
+
+    REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
+    if [ -n "$REQ_STATE" ]; then
+        warning "Packages install failed again! exit."
+	exit
+    fi
+
+
     # echo "Install upnp and airplay support."
 
 	# SOFT=$(dpkg -l libupnpp4 | grep "<none>")
