@@ -40,19 +40,19 @@ function install_sysreq() {
 		apt -y install $PACKAGES
 	fi
     
-    REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
-    if [ ! -n "$REQ_STATE" ]; then
-        warning "Packages install failed! try to fix."
-	apt -y --fix-broken install
-    else
-        success "Packages install sucessful!"
-    fi
+#    REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
+#    if [ ! -n "$REQ_STATE" ]; then
+#        warning "Packages install failed! try to fix."
+#	apt -y --fix-broken install
+#    else
+#        success "Packages install sucessful!"
+#    fi
 
-    REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
-    if [ ! -n "$REQ_STATE" ]; then
-        warning "Packages install failed again! exit."
-	exit
-    fi
+#    REQ_STATE=$(dpkg -l $PACKAGES | grep "un ")
+#    if [ ! -n "$REQ_STATE" ]; then
+#        warning "Packages install failed again! exit."
+#	exit
+#    fi
 
 
     # echo "Install upnp and airplay support."
