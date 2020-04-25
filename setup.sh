@@ -1,19 +1,16 @@
 #!/bin/bash
 PACKAGES_OLD="curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libasound2-dev libudev-dev libibus-1.0-dev libdbus-1-dev fcitx-libs-dev libsndio-dev libx11-dev libxcursor-dev libxext-dev libxi-dev libxinerama-dev libxkbcommon-dev libxrandr-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libgl1-mesa-dev libegl1-mesa-dev libgles2-mesa-dev libgl1-mesa-dev libglu1-mesa-dev libdrm-dev libgbm-dev devscripts debhelper dh-autoreconf libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2"
-PACKAGES="imagemagick ffmpeg curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2 fcitx-libs-dev libdrm-dev libgbm-dev"
+PACKAGES="imagemagick ffmpeg curl git mpc mpd ncmpc samba samba-common-bin wiringpi dnsmasq hostapd bridge-utils libsdl2-gfx-1.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0 libsdl2-gfx-dev libsdl2-ttf-dev libsdl2-image-dev libmpdclient-dev libmpdclient2 fcitx-libs-dev libdrm-dev libgbm-dev libjsoncpp1 libmicrohttpd12 shairport-sync"
 URL_LIBSDL2="https://files.retropie.org.uk/binaries/buster/rpi1/libsdl2-2.0-0_2.0.10+5rpi_armhf.deb"
 URL_LIBSDL2_DEV="https://files.retropie.org.uk/binaries/buster/rpi1/libsdl2-dev_2.0.10+5rpi_armhf.deb"
 FILE_RCLOCAL="/etc/rc.local"
 FILE_CONFIG="/boot/config.txt"
 FILE_MPDCONFIG="/etc/mpd.conf"
-UPMPD_URL="http://www.lesbonscomptes.com/upmpdcli/downloads/raspbian/pool/main/u/upmpdcli/upmpdcli_1.2.16-1~ppa1~stretch_armhf.deb"
-UPMPD_FILENAME="upmpdcli_1.2.16-1~ppa1~stretch_armhf.deb"
-LIBUPNP6_URL="http://www.lesbonscomptes.com/upmpdcli/downloads/raspbian/pool/main/libu/libupnp/libupnp6_1.6.20.jfd5-1~ppa1~stretch_armhf.deb"
-LIBUPNP6_FILENAME="libupnp6_1.6.20.jfd5-1~ppa1~stretch_armhf.deb"
-LIBUPNPP4_URL="http://www.lesbonscomptes.com/upmpdcli/downloads/raspbian/pool/main/libu/libupnpp4/libupnpp4_0.16.1-1~ppa1~stretch_armhf.deb"
-LIBUPNPP4_FILENAME="libupnpp4_0.16.1-1~ppa1~stretch_armhf.deb"
-SHAIRPORTSYNCMR_URL="http://repo.volumio.org/Volumio2/Binaries/shairport-sync-metadata-reader-arm.tar.gz"
-SHAIRPORTSYNCMR_FILENAME="shairport-sync-metadata-reader-arm.tar.gz"
+URL_LIBNPUPNP1="https://www.lesbonscomptes.com/upmpdcli/downloads/raspbian/pool/main/libn/libnpupnp1/libnpupnp1_2.2.1-1~ppa1~buster_armhf.deb"
+URL_LIBUPNPP6="https://www.lesbonscomptes.com/upmpdcli/downloads/raspbian/pool/main/libu/libupnpp6/libupnpp6_0.18.0-3~ppa1~buster_armhf.deb"
+URL_UPMPDCLI="https://www.lesbonscomptes.com/upmpdcli/downloads/raspbian/pool/main/u/upmpdcli/upmpdcli_1.4.7-1~ppa1~buster_armhf.deb"
+URL_SHAIRPORTSYNC="http://repo.volumio.org/Volumio2/Binaries/shairport-sync_3.3.6-arm.deb"
+URL_SHAIRPORTSYNCMR="http://repo.volumio.org/Volumio2/Binaries/shairport-sync-metadata-reader-arm.tar.gz"
 RETROGAME_URL="https://github.com/adafruit/Adafruit-Retrogame/raw/master/retrogame"
 FILE_MODULES="/etc/modules"
 
@@ -84,15 +81,15 @@ function install_sysreq() {
 		# echo "Upmpdcli install complete."
 	# fi
 
-	# if [ ! -f "/usr/local/bin/shairport-sync-metadata-reader" ]; then
-		# echo "Install shairpot-sync metadata reader."
-		# cd /
-		# curl -LJ0 -o $SHAIRPORTSYNCMR_FILENAME  $SHAIRPORTSYNCMR_URL
-		# tar xf $SHAIRPORTSYNCMR_FILENAME
-		# if [ -f "$SHAIRPORTSYNCMR_FILENAME" ]; then
-			# rm $SHAIRPORTSYNCMR_FILENAME
-		# fi
-	# fi
+	if [ ! -f "/usr/local/bin/shairport-sync-metadata-reader" ]; then
+		echo "Install shairpot-sync metadata reader."
+		cd /
+		curl -LJ0 -o $SHAIRPORTSYNCMR_FILENAME  $SHAIRPORTSYNCMR_URL
+		tar xf $SHAIRPORTSYNCMR_FILENAME
+		if [ -f "$SHAIRPORTSYNCMR_FILENAME" ]; then
+			rm $SHAIRPORTSYNCMR_FILENAME
+		fi
+	fi
     
 	inform "Install hostapd"
     if [ ! -f "/usr/sbin/hostapd-ori" ]; then
@@ -111,8 +108,15 @@ function install_sysreq() {
 	fi
 	
 	inform "Install libsdl2"
-	dpkg -i packages/libsdl2-*.deb
+	dpkg -i packages/*.deb
 	apt -y --fix-broken install
+	
+
+	inform "Install shairport-sync"
+	if [ ! -f "packages/shairport-sync-metadata-reader-arm.tar.gz" ]; then
+		curl -LJ0 -o packages/shairport-sync-metadata-reader-arm.tar.gz $URL_SHAIRPORTSYNCMR
+	fi
+	tar xf packages/shairport-sync-metadata-reader-arm.tar.gz -C /
 	
 	inform "Install ympd"
     if [ ! -f "/usr/local/bin/ympd" ]; then
