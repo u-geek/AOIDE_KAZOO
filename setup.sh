@@ -331,12 +331,13 @@ function config_input(){
 	echo "uinput" >> $FILE_MODULES
 	touch /etc/udev/rules.d/10-retrogame.rules
 	echo "SUBSYSTEM==\"input\", ATTRS{name}==\"retrogame\", ENV{ID_INPUT_KEYBOARD}=\"1\"" > /etc/udev/rules.d/10-retrogame.rules
-	if [ ! -f "/usr/local/bin/retrogame" ]; then
-		if [ ! -f "packages/retrogame" ]; then
-			curl -LJ0 -o /usr/local/bin/retrogame $RETROGAME_URL
-			chmod +x /usr/local/bin/retrogame
-		fi
-		cp packages/retrogame /usr/local/bin/retrogame
+	if [ -f "packages/retrogame" ]; then
+		chmod +x packages/retrogame
+		cp packages/retrogame /usr/local/bin/
+	else
+		curl -LJ0 -o packages/retrogame $RETROGAME_URL
+		chmod +x packages/retrogame
+		cp packages/retrogame /usr/local/bin/
 	fi
 	sed -i '/^exit 0/i\/usr\/local\/bin\/retrogame &' $FILE_RCLOCAL
 	if [ -f "/boot/retrogame.cfg" ]; then
