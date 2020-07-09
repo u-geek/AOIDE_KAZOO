@@ -5,6 +5,7 @@ This board is perfect for upgrading an existing hi-fi amp and speakers, or a se
 Pirate Audio is a range of all-in-one audio boards for Raspberry Pi, with high-quality digital audio, beautifully-crisp IPS displays for album art, tactile buttons for playback control, and our custom Pirate Audio software and installer to make setting it all up a breeze.
 
 Features
+
 Line-level digital audio (24-bit / 192KHz) over I2S
 
 PCM5102A DAC chip 
