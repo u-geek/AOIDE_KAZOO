@@ -1,4 +1,5 @@
 Aodie KAZOO: Audio Line-out for Raspberry Pi Zero
+
 This board is perfect for upgrading an existing hi-fi amp and speakers, or a set of powered monitors, with digital audio from local audio files (MP3, FLAC, etc.) or from streaming services like Spotify. The DAC on Pirate Audio Line-out gives you crisp 24-bit / 192KHz digital audio through its 3.5mm stereo jack.
 
 Pirate Audio is a range of all-in-one audio boards for Raspberry Pi, with high-quality digital audio, beautifully-crisp IPS displays for album art, tactile buttons for playback control, and our custom Pirate Audio software and installer to make setting it all up a breeze.
@@ -29,6 +30,7 @@ Features
 Dimensions: 65x30.5x9.5mm
 
 Software
+
 Our software installs the Python library for the LCD, configures the I2S audio and SPI, and then installs Mopidy and our custom Pirate Audio plugins to display album art and track info, and to use the buttons for playback control.
 
 Here's how to get started:
@@ -50,6 +52,7 @@ Here's how to get started:
 4.Reboot your Pi
 
 Build Your Own
+
 If you're planning to build your own application you'll find some inspiration in examples.
 
 But first you'll need some dependencies:
