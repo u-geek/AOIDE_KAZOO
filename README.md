@@ -48,7 +48,7 @@ Here's how to get started:
     
     cd AOIDE_KAZOO
     
-    sudo ./install.sh
+    sudo ./setup.sh
     
 4.Reboot your Pi
 
